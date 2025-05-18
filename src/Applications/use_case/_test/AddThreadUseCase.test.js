@@ -8,6 +8,7 @@ describe('AddThreadUseCase', () => {
     const useCasePayload = {
       title: 'a thread',
       body: 'thread body',
+      userId: 'user-1',
     };
     const mockPostedThread = new PostedThread({
       id: 'thread-1',
@@ -30,6 +31,7 @@ describe('AddThreadUseCase', () => {
     expect(mockThreadRepository.addThread).toHaveBeenCalledWith(new PostThread({
       title: useCasePayload.title,
       body: useCasePayload.body,
+      userId: useCasePayload.userId,
     }));
   });
 });

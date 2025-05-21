@@ -67,6 +67,14 @@ DomainErrorTranslator._glossary = {
       PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'judul atau badan thread tidak berupa string',
     },
   },
+  POST_COMMENT: {
+    message: 'gagal memposting komentar',
+    description: {
+      PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY: 'komentar tidak boleh kosong',
+      PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'komentar tidak berupa string',
+      THREADID_LIMIT_CHAR: 'thread tidak valid',
+    },
+  },
 };
 
 module.exports = DomainErrorTranslator;

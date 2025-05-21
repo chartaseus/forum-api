@@ -7,12 +7,11 @@ class AddCommentUseCase {
   }
 
   async execute(useCasePayload) {
-    // verify thread existence
-    const { threadId } = useCasePayload;
-    await this._threadRepository.checkThreadExistence(threadId);
-
     // create payload object
     const postComment = new PostComment(useCasePayload);
+
+    // verify thread existence
+    await this._threadRepository.checkThreadExistence(postComment.threadId);
 
     // add comment to database
     const postedComment = await this._commentRepository.addComment(postComment);

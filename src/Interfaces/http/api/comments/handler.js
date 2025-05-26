@@ -3,6 +3,7 @@ class CommentsHandler {
     this._container = container;
 
     this.postCommentHandler = this.postCommentHandler.bind(this);
+    this.deleteCommentHandler = this.deleteCommentHandler.bind(this);
   }
 
   async postCommentHandler(request, h) {
@@ -18,6 +19,15 @@ class CommentsHandler {
     });
     response.created();
     return response;
+  }
+
+  async deleteCommentHandler(request) {
+    const { id: userId } = request.auth.credentials;
+    const useCasePayload = { userId, ...request.params };
+    const deleteCommentUseCase = this._container.getInstance('DeleteCommentUseCase');
+    await deleteCommentUseCase.execute(useCasePayload);
+
+    return { status: 'success' };
   }
 }
 

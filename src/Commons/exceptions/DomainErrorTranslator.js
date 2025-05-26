@@ -75,6 +75,13 @@ DomainErrorTranslator._glossary = {
       THREADID_LIMIT_CHAR: 'thread tidak valid',
     },
   },
+  DELETE_COMMENT_USE_CASE: {
+    message: 'gagal menghapus komentar',
+    description: {
+      PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY: 'data yang dibutuhkan tidak lengkap',
+      PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'tipe data tidak sesuai',
+    },
+  },
 };
 
 module.exports = DomainErrorTranslator;

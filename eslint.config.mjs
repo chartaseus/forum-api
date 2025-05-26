@@ -18,6 +18,9 @@ export default defineConfig([
         { allowAllPropertiesOnSameLine: true },
       ],
       '@stylistic/object-curly-newline': ['error', { multiline: true }],
+      '@stylistic/arrow-parens': ['error', 'always'],
+      '@stylistic/brace-style': ['error', '1tbs'],
+      '@stylistic/quotes': ['error', 'single', { allowTemplateLiterals: 'avoidEscape' }],
     },
   },
   {

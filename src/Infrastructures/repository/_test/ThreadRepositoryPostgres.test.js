@@ -3,6 +3,7 @@ const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const PostedThread = require('../../../Domains/threads/entities/PostedThread');
 const PostThread = require('../../../Domains/threads/entities/PostThread');
+const ThreadDetail = require('../../../Domains/threads/entities/ThreadDetail');
 const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 
@@ -75,7 +76,31 @@ describe('ThreadRepositoryPostgres', () => {
   });
 
   describe('getThreadById function', () => {
-    it.todo('should throw NotFoundError when thread not found');
-    it.todo('should return thread correctly');
+    it('should throw NotFoundError when thread not found', async () => {
+      const nonexistentThreadId = 'thread-takada';
+      const fakeIdGenerator = () => '123';
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+
+      await expect(threadRepositoryPostgres.getThreadById(nonexistentThreadId))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should return thread correctly', async () => {
+      const threadId = 'thread-123456';
+      await ThreadsTableTestHelper.addThread({ id: threadId });
+
+      const fakeIdGenerator = () => '123';
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+
+      const thread = await threadRepositoryPostgres.getThreadById(threadId);
+
+      expect(thread).toBeInstanceOf(ThreadDetail);
+      expect(thread).toMatchObject({
+        id: threadId,
+        title: 'test',
+        body: 'test helper',
+        username: 'dicoding',
+      });
+    });
   });
 });

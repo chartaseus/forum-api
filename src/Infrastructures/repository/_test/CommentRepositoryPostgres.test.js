@@ -3,6 +3,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
+const CommentDetail = require('../../../Domains/comments/entities/CommentDetail');
 const PostComment = require('../../../Domains/comments/entities/PostComment');
 const PostedComment = require('../../../Domains/comments/entities/PostedComment');
 const pool = require('../../database/postgres/pool');
@@ -127,6 +128,43 @@ describe('CommentRepositoryPostgres', () => {
       });
 
       expect(isOwnComment).toEqual(true);
+    });
+  });
+
+  describe('getThreadComments function', () => {
+    it('should return empty array if thread has no comments', async () => {
+      const threadId = 'thread-gotnocommentsyet';
+      await ThreadsTableTestHelper.addThread({ id: threadId });
+
+      const fakeIdGenerator = () => '456';
+      const commentRepository = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      const comments = await commentRepository.getThreadComments(threadId);
+
+      expect(comments).toStrictEqual([]);
+    });
+
+    it('should return array of thread comments in ascending order', async () => {
+      const threadId = 'thread-tocommenton';
+      const firstCommentId = 'comment-first';
+      const secondCommentId = 'comment-second';
+      await ThreadsTableTestHelper.addThread({ id: threadId });
+      await CommentsTableTestHelper.addComment({ threadId, id: firstCommentId });
+      await CommentsTableTestHelper.addComment({ threadId, id: secondCommentId });
+
+      const fakeIdGenerator = () => '456';
+      const commentRepository = new CommentRepositoryPostgres(pool, fakeIdGenerator);
+
+      const comments = await commentRepository.getThreadComments(threadId);
+
+      expect(comments).toHaveLength(2);
+      comments.forEach((comment) => {
+        expect(comment).toBeInstanceOf(CommentDetail);
+      });
+
+      // comment sorting
+      expect(comments[0].id).toEqual(firstCommentId);
+      expect(comments[1].id).toEqual(secondCommentId);
     });
   });
 

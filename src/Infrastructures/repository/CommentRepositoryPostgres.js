@@ -1,6 +1,7 @@
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
+const CommentDetail = require('../../Domains/comments/entities/CommentDetail');
 const PostedComment = require('../../Domains/comments/entities/PostedComment');
 
 class CommentRepositoryPostgres extends CommentRepository {
@@ -56,6 +57,25 @@ class CommentRepositoryPostgres extends CommentRepository {
     } else {
       throw new AuthorizationError('Anda bukan pemilik komentar ini');
     }
+  }
+
+  async getThreadComments(threadId) {
+    const query = {
+      text: `SELECT comments.id, comments.time, comments.body, users.username
+        FROM comments
+        INNER JOIN users ON comments.owner = users.id
+        WHERE comments.parent = $1
+        ORDER BY comments.time ASC`,
+      values: [threadId],
+    };
+
+    const { rows } = await this._pool.query(query);
+
+    return rows.map((comment) => new CommentDetail({
+      ...comment,
+      date: comment.time.toString(),
+      content: comment.body,
+    }));
   }
 
   async softDeleteComment(id) {

@@ -3,6 +3,7 @@ class ThreadsHandler {
     this._container = container;
 
     this.postThreadHandler = this.postThreadHandler.bind(this);
+    this.getThreadHandler = this.getThreadHandler.bind(this);
   }
 
   async postThreadHandler(request, h) {
@@ -17,6 +18,17 @@ class ThreadsHandler {
     });
     response.code(201);
     return response;
+  }
+
+  async getThreadHandler(request) {
+    const useCasePayload = request.params;
+    const viewThreadUseCase = this._container.getInstance('ViewThreadUseCase');
+    const thread = await viewThreadUseCase.execute(useCasePayload);
+
+    return {
+      status: 'success',
+      data: { thread },
+    };
   }
 }
 

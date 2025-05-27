@@ -22,7 +22,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
 
-    return new PostedComment({ ...result.rows[0] });
+    return new PostedComment(result.rows[0]);
   }
 
   async checkCommentExistence(id) {
@@ -61,7 +61,12 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getThreadComments(threadId) {
     const query = {
-      text: `SELECT comments.id, comments.time, comments.body, users.username, comments.is_deleted
+      text: `SELECT
+          comments.id,
+          comments.time::TEXT AS "date",
+          comments.body AS "content",
+          comments.is_deleted AS "isDeleted",
+          users.username
         FROM comments
         INNER JOIN users ON comments.owner = users.id
         WHERE comments.parent = $1
@@ -71,12 +76,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const { rows } = await this._pool.query(query);
 
-    return rows.map((comment) => new CommentDetail({
-      ...comment,
-      date: comment.time.toString(),
-      content: comment.body,
-      isDeleted: comment.is_deleted,
-    }));
+    return rows.map((comment) => new CommentDetail(comment));
   }
 
   async softDeleteComment(id) {

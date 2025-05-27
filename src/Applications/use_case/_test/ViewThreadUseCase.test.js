@@ -19,12 +19,14 @@ describe('ViewThreadUseCase', () => {
       content: 'isi komentar',
       date: '2025-05-26T06:34:54.598Z',
       username: 'user2',
+      isDeleted: false,
     });
     const comment2 = new CommentDetail({
       id: 'comment-2',
       content: 'isi komentar',
       date: '2025-05-26T06:35:54.598Z',
       username: 'user1',
+      isDeleted: true,
     });
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();

@@ -61,7 +61,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async getThreadComments(threadId) {
     const query = {
-      text: `SELECT comments.id, comments.time, comments.body, users.username
+      text: `SELECT comments.id, comments.time, comments.body, users.username, comments.is_deleted
         FROM comments
         INNER JOIN users ON comments.owner = users.id
         WHERE comments.parent = $1
@@ -75,6 +75,7 @@ class CommentRepositoryPostgres extends CommentRepository {
       ...comment,
       date: comment.time.toString(),
       content: comment.body,
+      isDeleted: comment.is_deleted,
     }));
   }
 

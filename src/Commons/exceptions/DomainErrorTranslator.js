@@ -82,6 +82,15 @@ DomainErrorTranslator._glossary = {
       PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'tipe data tidak sesuai',
     },
   },
+  POST_REPLY: {
+    message: 'gagal memposting balasan',
+    description: {
+      PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY: 'balasan tidak boleh kosong',
+      PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'balasan tidak berupa string',
+      THREADID_LIMIT_CHAR: 'thread tidak valid',
+      COMMENTID_LIMIT_CHAR: 'komentar tidak valid',
+    },
+  },
 };
 
 module.exports = DomainErrorTranslator;

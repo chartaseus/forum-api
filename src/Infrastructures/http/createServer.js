@@ -6,6 +6,7 @@ const users = require('../../Interfaces/http/api/users');
 const authentications = require('../../Interfaces/http/api/authentications');
 const threads = require('../../Interfaces/http/api/threads');
 const comments = require('../../Interfaces/http/api/comments');
+const replies = require('../../Interfaces/http/api/replies');
 
 const createServer = async (container) => {
   const server = Hapi.server({
@@ -25,7 +26,7 @@ const createServer = async (container) => {
       sub: false,
       maxAgeSec: process.env.ACCESS_TOKEN_AGE,
     },
-    validate: (artifacts) => ({
+    validate: /* istanbul ignore next */ (artifacts) => ({
       isValid: true,
       credentials: { id: artifacts.decoded.payload.id },
     }),
@@ -46,6 +47,10 @@ const createServer = async (container) => {
     },
     {
       plugin: comments,
+      options: { container },
+    },
+    {
+      plugin: replies,
       options: { container },
     },
   ]);

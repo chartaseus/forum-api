@@ -1,4 +1,5 @@
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const container = require('../../container');
@@ -7,6 +8,7 @@ const createServer = require('../createServer');
 
 describe('/threads endpoint', () => {
   const userId = 'user-1';
+
   beforeAll(async () => {
     // console.log('adding a test user...');
     await UsersTableTestHelper.addUser({
@@ -15,6 +17,7 @@ describe('/threads endpoint', () => {
       password: 'test',
       fullname: 'threads plugin test helper',
     });
+    await UsersTableTestHelper.addUser({});
   });
 
   afterEach(async () => {
@@ -123,16 +126,25 @@ describe('/threads endpoint', () => {
 
   describe('when GET /threads/{threadId}', () => {
     const threadId = 'thread-getthreadtest';
+    const firstCommentId = 'comment-first';
+    const secondCommentId = 'comment-second';
+    const firstReplyId = 'reply-1-1';
+    const secondReplyId = 'reply-1-2';
+    const thirdReplyId = 'reply-2-1';
 
     beforeEach(async () => {
       // console.log('adding a test thread...');
       await ThreadsTableTestHelper.addThread({ id: threadId, userId });
       // console.log('adding comments to test thread...');
-      await CommentsTableTestHelper.addComment({ id: 'comment-first', threadId, userId });
-      await CommentsTableTestHelper.addComment({ id: 'comment-second', threadId, userId });
+      await CommentsTableTestHelper.addComment({ id: firstCommentId, threadId, userId });
+      await CommentsTableTestHelper.addComment({ id: secondCommentId, threadId, userId });
+      await RepliesTableTestHelper.addReply({ id: firstReplyId, commentId: firstCommentId });
+      await RepliesTableTestHelper.addReply({ id: secondReplyId, commentId: firstCommentId });
+      await RepliesTableTestHelper.addReply({ id: thirdReplyId, commentId: secondCommentId });
     });
 
     afterEach(async () => {
+      await RepliesTableTestHelper.cleanTable();
       // console.log('cleaning comments table...');
       await CommentsTableTestHelper.cleanTable();
     });
@@ -146,6 +158,7 @@ describe('/threads endpoint', () => {
       });
 
       const responseJson = JSON.parse(response.payload);
+      const comments = responseJson.data.thread.comments;
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
       expect(responseJson.data.thread).toMatchObject({
@@ -155,7 +168,10 @@ describe('/threads endpoint', () => {
         username: 'threadstesthelper',
       });
       expect(responseJson.data.thread.date).toBeDefined();
-      expect(responseJson.data.thread.comments).toBeDefined();
+      expect(comments).toBeDefined();
+      comments.forEach((comment) => {
+        expect(comment.replies).toBeDefined();
+      });
     });
 
     it('should respond with 404 when thread not found or invalid', async () => {
@@ -201,6 +217,42 @@ describe('/threads endpoint', () => {
       const comments = JSON.parse(response.payload).data.thread.comments;
       expect(comments).toHaveLength(3);
       expect(comments[2].content).toEqual('**komentar telah dihapus**');
+    });
+
+    it('should return all replies under correct comments in ascending order', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${threadId}`,
+      });
+
+      const [comment1, comment2] = JSON.parse(response.payload).data.thread.comments;
+      expect(comment1.replies).toHaveLength(2);
+      expect(comment2.replies).toHaveLength(1);
+
+      const [reply1, reply2] = comment1.replies;
+      expect(reply1.id).toEqual(firstReplyId);
+      expect(reply2.id).toEqual(secondReplyId);
+
+      expect(comment2.replies[0].id).toEqual(thirdReplyId);
+    });
+
+    it('should return deleted replies content as "**balasan telah dihapus**"', async () => {
+      await RepliesTableTestHelper.addDeletedReply({
+        id: 'reply-deleted',
+        commentId: secondCommentId,
+      });
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/threads/${threadId}`,
+      });
+
+      const comment2 = JSON.parse(response.payload).data.thread.comments[1];
+      expect(comment2.replies).toHaveLength(2);
+      expect(comment2.replies[1].content).toEqual('**balasan telah dihapus**');
     });
   });
 });

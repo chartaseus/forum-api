@@ -4,6 +4,7 @@ const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const PostedReply = require('../../../Domains/replies/entities/PostedReply');
 const PostReply = require('../../../Domains/replies/entities/PostReply');
+const ReplyDetail = require('../../../Domains/replies/entities/ReplyDetail');
 const pool = require('../../database/postgres/pool');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 
@@ -65,6 +66,43 @@ describe('ReplyRepositoryPostgres', () => {
         content: 'Halo!',
         owner: 'user-123',
       }));
+    });
+  });
+
+  describe('getThreadReplies function', () => {
+    it('should return empty array if thread has no replies', async () => {
+      const threadId = 'thread-gotnorepliesyet';
+      await ThreadsTableTestHelper.addThread({ id: threadId });
+
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const replies = await replyRepository.getThreadReplies(threadId);
+
+      expect(replies).toStrictEqual([]);
+    });
+
+    it('should return array of replies in ascending order', async () => {
+      const threadId = 'thread-123';
+      const commentId = 'comment-123';
+      const firstReplyId = 'comment-first';
+      const secondReplyId = 'comment-second';
+      await RepliesTableTestHelper.addReply({ commentId, id: firstReplyId });
+      await RepliesTableTestHelper.addReply({ commentId, id: secondReplyId });
+
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const replies = await replyRepository.getThreadReplies(threadId);
+
+      expect(replies).toHaveLength(2);
+      replies.forEach((reply) => {
+        expect(reply).toBeInstanceOf(ReplyDetail);
+      });
+
+      // reply sorting
+      expect(replies[0].id).toEqual(firstReplyId);
+      expect(replies[1].id).toEqual(secondReplyId);
     });
   });
 });

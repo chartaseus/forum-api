@@ -2,31 +2,17 @@ const InvariantError = require('./InvariantError');
 
 const DomainErrorTranslator = {
   translate(error) {
-    // return DomainErrorTranslator._directories[error.message] || error;
-
     const [domain, key] = error.message.split('.');
 
     if (!(domain in this._glossary)) return error;
 
-    return new InvariantError(
-      this._glossary[domain].message
+    const message = this._glossary[domain].message
       + (this._glossary[domain].message ? ' karena ' : '')
-      + this._glossary[domain].description[key]);
+      + this._glossary[domain].description[key];
+
+    return new InvariantError(message);
   },
 };
-
-// DomainErrorTranslator._directories = {
-//   'REGISTER_USER.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('tidak dapat membuat user baru karena properti yang dibutuhkan tidak ada'),
-//   'REGISTER_USER.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('tidak dapat membuat user baru karena tipe data tidak sesuai'),
-//   'REGISTER_USER.USERNAME_LIMIT_CHAR': new InvariantError('tidak dapat membuat user baru karena karakter username melebihi batas limit'),
-//   'REGISTER_USER.USERNAME_CONTAIN_RESTRICTED_CHARACTER': new InvariantError('tidak dapat membuat user baru karena username mengandung karakter terlarang'),
-//   'USER_LOGIN.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('harus mengirimkan username dan password'),
-//   'USER_LOGIN.NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('username dan password harus string'),
-//   'REFRESH_AUTHENTICATION_USE_CASE.NOT_CONTAIN_REFRESH_TOKEN': new InvariantError('harus mengirimkan token refresh'),
-//   'REFRESH_AUTHENTICATION_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('refresh token harus string'),
-//   'DELETE_AUTHENTICATION_USE_CASE.NOT_CONTAIN_REFRESH_TOKEN': new InvariantError('harus mengirimkan token refresh'),
-//   'DELETE_AUTHENTICATION_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('refresh token harus string'),
-// };
 
 DomainErrorTranslator._glossary = {
   REGISTER_USER: {

@@ -16,7 +16,7 @@ class ThreadsHandler {
       status: 'success',
       data: { addedThread },
     });
-    response.code(201);
+    response.created();
     return response;
   }
 

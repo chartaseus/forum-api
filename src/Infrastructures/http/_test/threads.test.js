@@ -10,7 +10,6 @@ describe('/threads endpoint', () => {
   const userId = 'user-1';
 
   beforeAll(async () => {
-    // console.log('adding a test user...');
     await UsersTableTestHelper.addUser({
       id: userId,
       username: 'threadstesthelper',
@@ -21,12 +20,10 @@ describe('/threads endpoint', () => {
   });
 
   afterEach(async () => {
-    // console.log('cleaning threads table...');
     await ThreadsTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
-    // console.log('cleaning users table...');
     await UsersTableTestHelper.cleanTable();
     await pool.end();
   });
@@ -119,9 +116,6 @@ describe('/threads endpoint', () => {
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('gagal memposting thread karena judul atau badan thread tidak berupa string');
     });
-
-    // maybe no need to test userId since it comes from database via auth strategy?
-    // it('should respond with 400 when userId exceeds 50 characters')
   });
 
   describe('when GET /threads/{threadId}', () => {
@@ -133,9 +127,7 @@ describe('/threads endpoint', () => {
     const thirdReplyId = 'reply-2-1';
 
     beforeEach(async () => {
-      // console.log('adding a test thread...');
       await ThreadsTableTestHelper.addThread({ id: threadId, userId });
-      // console.log('adding comments to test thread...');
       await CommentsTableTestHelper.addComment({ id: firstCommentId, threadId, userId });
       await CommentsTableTestHelper.addComment({ id: secondCommentId, threadId, userId });
       await RepliesTableTestHelper.addReply({ id: firstReplyId, commentId: firstCommentId });
@@ -145,7 +137,6 @@ describe('/threads endpoint', () => {
 
     afterEach(async () => {
       await RepliesTableTestHelper.cleanTable();
-      // console.log('cleaning comments table...');
       await CommentsTableTestHelper.cleanTable();
     });
 
@@ -159,6 +150,7 @@ describe('/threads endpoint', () => {
 
       const responseJson = JSON.parse(response.payload);
       const comments = responseJson.data.thread.comments;
+
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
       expect(responseJson.data.thread).toMatchObject({
@@ -175,7 +167,8 @@ describe('/threads endpoint', () => {
     });
 
     it('should respond with 404 when thread not found or invalid', async () => {
-      const notFoundThreadId = 'xxx';
+      const notFoundThreadId = 'thread-nonexistent';
+
       const server = await createServer(container);
 
       const response = await server.inject({
@@ -207,6 +200,7 @@ describe('/threads endpoint', () => {
 
     it('should return deleted comment content as "**komentar telah dihapus**"', async () => {
       await CommentsTableTestHelper.addDeletedComment({ id: 'comment-third', userId, threadId });
+
       const server = await createServer(container);
 
       const response = await server.inject({
@@ -243,6 +237,7 @@ describe('/threads endpoint', () => {
         id: 'reply-deleted',
         commentId: secondCommentId,
       });
+
       const server = await createServer(container);
 
       const response = await server.inject({

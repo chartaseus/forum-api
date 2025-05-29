@@ -15,11 +15,11 @@ describe('/threads/{threadId}/comments endpoint', () => {
   beforeAll(async () => {
     await UsersTableTestHelper.addUser({});
     await ThreadsTableTestHelper.addThread({});
-    await UsersTableTestHelper.addUser({ id: 'user-456', username: 'user2' });
+    await UsersTableTestHelper.addUser({ id: preaddedComment.userId, username: 'user2' });
   });
 
   beforeEach(async () => {
-    await CommentsTableTestHelper.addComment({ ...preaddedComment });
+    await CommentsTableTestHelper.addComment(preaddedComment);
   });
 
   afterEach(async () => {
@@ -71,6 +71,7 @@ describe('/threads/{threadId}/comments endpoint', () => {
 
       const responseJson = JSON.parse(response.payload);
       const { id, content, owner } = responseJson.data.addedComment;
+
       expect(response.statusCode).toEqual(201);
       expect(responseJson.status).toEqual('success');
       expect(id).toContain('comment-');

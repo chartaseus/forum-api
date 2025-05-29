@@ -28,6 +28,7 @@ describe('ThreadRepositoryPostgres', () => {
         body: 'Halo!',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
@@ -43,6 +44,7 @@ describe('ThreadRepositoryPostgres', () => {
         body: 'Halo!',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
@@ -58,6 +60,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('checkThreadExistence function', () => {
     it('should throw NotFoundError when thread not found', async () => {
       const nonexistentThreadId = 'thread-takada';
+
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
@@ -78,6 +81,7 @@ describe('ThreadRepositoryPostgres', () => {
   describe('getThreadById function', () => {
     it('should throw NotFoundError when thread not found', async () => {
       const nonexistentThreadId = 'thread-takada';
+
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 

@@ -6,7 +6,8 @@ class CommentRepository {
   async checkCommentExistence() {
     /**
      * @returns {boolean} returns false if comment is soft-deleted
-     * @throws error if comment id not found in the database */
+     * @throws error if comment id not found in the database
+     * */
     throw new Error('COMMENT_REPOSITORY.METHOD_NOT_IMPLEMENTED');
   }
 

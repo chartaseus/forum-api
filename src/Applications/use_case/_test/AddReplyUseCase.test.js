@@ -18,6 +18,7 @@ describe('AddReplyUseCase', () => {
       content: useCasePayload.content,
       owner: useCasePayload.userId,
     });
+
     const mockReplyRepository = new ReplyRepository();
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
@@ -31,6 +32,7 @@ describe('AddReplyUseCase', () => {
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,
     });
+
     const addedReply = await addReplyUseCase.execute(useCasePayload);
 
     expect(addedReply).toStrictEqual(new PostedReply({

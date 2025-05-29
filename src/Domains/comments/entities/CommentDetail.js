@@ -1,6 +1,7 @@
 class CommentDetail {
   constructor(payload) {
     this._verifyPayload(payload);
+
     const { id, username, date, content, isDeleted } = payload;
 
     this.id = id;
@@ -22,8 +23,7 @@ class CommentDetail {
       || typeof username !== 'string'
       || typeof date !== 'string'
       || typeof content !== 'string'
-      || typeof isDeleted !== 'boolean'
-    ) {
+      || typeof isDeleted !== 'boolean') {
       throw new Error('COMMENT_DETAIL.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

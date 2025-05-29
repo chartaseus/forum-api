@@ -13,21 +13,19 @@ const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 describe('ReplyRepositoryPostgres', () => {
   beforeAll(async () => {
     await UsersTableTestHelper.addUser({});
+    await UsersTableTestHelper.addUser({ id: 'user-456', username: 'seconduser' });
     await ThreadsTableTestHelper.addThread({});
     await CommentsTableTestHelper.addComment({});
-
-    // add a second user
-    await UsersTableTestHelper.addUser({
-      id: 'user-456',
-      username: 'seconduser',
-    });
   });
+
   beforeEach(async () => {
     await RepliesTableTestHelper.addReply({});
   });
+
   afterEach(async () => {
     await RepliesTableTestHelper.cleanTable();
   });
+
   afterAll(async () => {
     await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
@@ -43,6 +41,7 @@ describe('ReplyRepositoryPostgres', () => {
         threadId: 'thread-123',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '456';
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
 
@@ -59,10 +58,12 @@ describe('ReplyRepositoryPostgres', () => {
         threadId: 'thread-123',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '456';
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
 
       const postedReply = await replyRepositoryPostgres.addReply(postReply);
+
       expect(postedReply).toStrictEqual(new PostedReply({
         id: 'reply-456',
         content: 'Halo!',

@@ -20,13 +20,16 @@ describe('CommentRepositoryPostgres', () => {
       username: 'seconduser',
     });
   });
+
   beforeEach(async () => {
     // add comment by the second user
     await CommentsTableTestHelper.addComment({ userId: 'user-456' });
   });
+
   afterEach(async () => {
     await CommentsTableTestHelper.cleanTable();
   });
+
   afterAll(async () => {
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
@@ -40,6 +43,7 @@ describe('CommentRepositoryPostgres', () => {
         content: 'Halo!',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '456';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
 
@@ -55,6 +59,7 @@ describe('CommentRepositoryPostgres', () => {
         content: 'Halo!',
         userId: 'user-123',
       });
+
       const fakeIdGenerator = () => '456';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
 

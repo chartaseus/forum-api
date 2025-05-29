@@ -54,6 +54,7 @@ describe('ViewThreadUseCase', () => {
       commentId: 'comment-2',
       isDeleted: false,
     });
+
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();

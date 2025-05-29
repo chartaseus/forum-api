@@ -16,6 +16,7 @@ describe('AddCommentUseCase', () => {
       body: useCasePayload.content,
       owner: useCasePayload.userId,
     });
+
     const mockCommentRepository = new CommentRepository();
     const mockThreadRepository = new ThreadRepository();
 
@@ -26,6 +27,7 @@ describe('AddCommentUseCase', () => {
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,
     });
+
     const addedComment = await addCommentUseCase.execute(useCasePayload);
 
     expect(addedComment).toStrictEqual(new PostedComment({

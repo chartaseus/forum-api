@@ -1,6 +1,6 @@
 const PostReply = require('../PostReply');
 
-describe ('a PostReply entity', () => {
+describe('a PostReply entity', () => {
   it('should throw error when payload does not contain required property', () => {
     const payloadWithoutcontent = {
       userId: 'user-2',

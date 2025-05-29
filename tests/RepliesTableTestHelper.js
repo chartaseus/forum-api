@@ -1,5 +1,6 @@
 const pool = require('../src/Infrastructures/database/postgres/pool');
 
+/* istanbul ignore file */
 const RepliesTableTestHelper = {
   async addReply({
     id = 'reply-123',
@@ -14,6 +15,7 @@ const RepliesTableTestHelper = {
 
     await pool.query(query);
   },
+
   async findReplyById(id) {
     const query = {
       text: 'SELECT * FROM replies WHERE id = $1',
@@ -23,6 +25,7 @@ const RepliesTableTestHelper = {
     const result = await pool.query(query);
     return result.rows;
   },
+
   async addDeletedReply({
     id = 'reply-deleted',
     commentId = 'comment-123',
@@ -37,6 +40,7 @@ const RepliesTableTestHelper = {
 
     await pool.query(query);
   },
+
   async cleanTable() {
     await pool.query('DELETE FROM replies WHERE 1=1');
   },

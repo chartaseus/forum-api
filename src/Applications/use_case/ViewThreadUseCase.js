@@ -36,6 +36,7 @@ class ViewThreadUseCase {
           return reply;
         });
     });
+
     return comments;
   }
 }

@@ -1,6 +1,6 @@
 const PostComment = require('../PostComment');
 
-describe ('a PostComment entity', () => {
+describe('a PostComment entity', () => {
   it('should throw error when payload does not contain required property', () => {
     const payloadWithoutcontent = {
       userId: 'user-2',

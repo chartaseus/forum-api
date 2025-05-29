@@ -1,6 +1,7 @@
 class ReplyDetail {
   constructor(payload) {
     this._verifyPayload(payload);
+
     const { id, username, date, content, commentId, isDeleted } = payload;
 
     this.id = id;
@@ -25,8 +26,7 @@ class ReplyDetail {
       || typeof date !== 'string'
       || typeof content !== 'string'
       || typeof commentId !== 'string'
-      || typeof isDeleted !== 'boolean'
-    ) {
+      || typeof isDeleted !== 'boolean') {
       throw new Error('REPLY_DETAIL.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

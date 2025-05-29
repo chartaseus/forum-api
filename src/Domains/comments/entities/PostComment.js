@@ -14,7 +14,9 @@ class PostComment {
       throw new Error('POST_COMMENT.PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof content !== 'string' || typeof userId !== 'string' || typeof threadId !== 'string') {
+    if (typeof content !== 'string'
+      || typeof userId !== 'string'
+      || typeof threadId !== 'string') {
       throw new Error('POST_COMMENT.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
 

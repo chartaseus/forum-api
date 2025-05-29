@@ -1,6 +1,6 @@
 const PostThread = require('../PostThread');
 
-describe ('a PostThread entity', () => {
+describe('a PostThread entity', () => {
   it('should throw error when payload does not contain required property', () => {
     const payload = { title: 'my first thread' };
 

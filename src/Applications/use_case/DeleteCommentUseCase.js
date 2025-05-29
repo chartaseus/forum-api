@@ -30,7 +30,9 @@ class DeleteCommentUseCase {
       throw new Error('DELETE_COMMENT_USE_CASE.PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof commentId !== 'string' || typeof threadId !== 'string' || typeof userId !== 'string') {
+    if (typeof commentId !== 'string'
+      || typeof threadId !== 'string'
+      || typeof userId !== 'string') {
       throw new Error('DELETE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

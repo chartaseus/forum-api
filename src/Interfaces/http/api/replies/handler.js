@@ -3,6 +3,7 @@ class RepliesHandler {
     this._container = container;
 
     this.postReplyHandler = this.postReplyHandler.bind(this);
+    this.deleteReplyHandler = this.deleteReplyHandler.bind(this);
   }
 
   async postReplyHandler(request, h) {
@@ -17,6 +18,15 @@ class RepliesHandler {
     });
     response.created();
     return response;
+  }
+
+  async deleteReplyHandler(request) {
+    const { id: userId } = request.auth.credentials;
+    const useCasePayload = { userId, ...request.params };
+    const deleteReplyUseCase = this._container.getInstance('DeleteReplyUseCase');
+    await deleteReplyUseCase.execute(useCasePayload);
+
+    return { status: 'success' };
   }
 }
 

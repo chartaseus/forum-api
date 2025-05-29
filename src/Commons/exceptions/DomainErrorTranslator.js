@@ -91,6 +91,13 @@ DomainErrorTranslator._glossary = {
       COMMENTID_LIMIT_CHAR: 'komentar tidak valid',
     },
   },
+  DELETE_REPLY_USE_CASE: {
+    message: 'gagal menghapus balasan',
+    description: {
+      PAYLOAD_NOT_CONTAIN_NEEDED_PROPERTY: 'data yang dibutuhkan tidak lengkap',
+      PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION: 'tipe data tidak sesuai',
+    },
+  },
 };
 
 module.exports = DomainErrorTranslator;

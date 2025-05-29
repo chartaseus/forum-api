@@ -1,3 +1,5 @@
+const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const PostedReply = require('../../Domains/replies/entities/PostedReply');
 const ReplyDetail = require('../../Domains/replies/entities/ReplyDetail');
 const ReplyRepository = require('../../Domains/replies/ReplyRepository');
@@ -43,6 +45,58 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const { rows } = await this._pool.query(query);
 
     return rows.map((reply) => new ReplyDetail(reply));
+  }
+
+  async checkReplyExistence(id) {
+    const query = {
+      text: 'SELECT is_deleted AS "isDeleted" FROM replies WHERE id = $1',
+      values: [id],
+    };
+
+    const { rows, rowCount } = await this._pool.query(query);
+
+    if (!rowCount) {
+      throw new NotFoundError('balasan tidak ditemukan');
+    }
+
+    return !rows[0].isDeleted;
+  }
+
+  async verifyReplyOwner({ replyId, userId }) {
+    const query = {
+      text: 'SELECT owner FROM replies WHERE id = $1',
+      values: [replyId],
+    };
+
+    const { rows, rowCount } = await this._pool.query(query);
+
+    if (!rowCount) {
+      throw new NotFoundError('balasan tidak ditemukan');
+    }
+
+    if (rows[0].owner === userId) {
+      return true;
+    } else {
+      throw new AuthorizationError('Anda bukan pemilik balasan ini');
+    }
+  }
+
+  async softDeleteReply(id) {
+    const query = {
+      text: `UPDATE replies
+        SET is_deleted = true 
+        WHERE id = $1
+        RETURNING is_deleted AS "isDeleted"`,
+      values: [id],
+    };
+
+    const { rows, rowCount } = await this._pool.query(query);
+
+    if (!rowCount) {
+      throw new NotFoundError('balasan tidak ditemukan');
+    }
+
+    return rows[0];
   }
 }
 

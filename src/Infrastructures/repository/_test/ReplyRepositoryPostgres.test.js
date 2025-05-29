@@ -2,6 +2,8 @@ const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelp
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const PostedReply = require('../../../Domains/replies/entities/PostedReply');
 const PostReply = require('../../../Domains/replies/entities/PostReply');
 const ReplyDetail = require('../../../Domains/replies/entities/ReplyDetail');
@@ -21,7 +23,7 @@ describe('ReplyRepositoryPostgres', () => {
     });
   });
   beforeEach(async () => {
-
+    await RepliesTableTestHelper.addReply({});
   });
   afterEach(async () => {
     await RepliesTableTestHelper.cleanTable();
@@ -83,10 +85,12 @@ describe('ReplyRepositoryPostgres', () => {
     });
 
     it('should return array of replies in ascending order', async () => {
-      const threadId = 'thread-123';
-      const commentId = 'comment-123';
-      const firstReplyId = 'comment-first';
-      const secondReplyId = 'comment-second';
+      const threadId = 'thread-456';
+      const commentId = 'comment-456';
+      const firstReplyId = 'reply-first';
+      const secondReplyId = 'reply-second';
+      await ThreadsTableTestHelper.addThread({ id: threadId });
+      await CommentsTableTestHelper.addComment({ id: commentId, threadId });
       await RepliesTableTestHelper.addReply({ commentId, id: firstReplyId });
       await RepliesTableTestHelper.addReply({ commentId, id: secondReplyId });
 
@@ -103,6 +107,89 @@ describe('ReplyRepositoryPostgres', () => {
       // reply sorting
       expect(replies[0].id).toEqual(firstReplyId);
       expect(replies[1].id).toEqual(secondReplyId);
+    });
+  });
+
+  describe('checkReplyExistence function', () => {
+    it('should throw NotFoundError when reply not found', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      await expect(replyRepository.checkReplyExistence('nonexistentId'))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should return true when reply exists', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const replyExists = await replyRepository.checkReplyExistence('reply-123');
+
+      expect(replyExists).toEqual(true);
+    });
+
+    it('should return false when reply status is deleted', async () => {
+      await RepliesTableTestHelper.addDeletedReply({ id: 'reply-todelete' });
+
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const replyExists = await replyRepository.checkReplyExistence('reply-todelete');
+
+      expect(replyExists).toEqual(false);
+    });
+  });
+
+  describe('verifyReplyOwner function', () => {
+    it('should throw NotFoundError when no matching data found', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      await expect(replyRepository.verifyReplyOwner({
+        replyId: 'reply-nonexistent',
+        userId: 'user-123',
+      })).rejects.toThrow(NotFoundError);
+    });
+
+    it('should throw AuthorizationError when userId is not the reply owner', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      await expect(replyRepository.verifyReplyOwner({
+        replyId: 'reply-123',
+        userId: 'user-456',
+      })).rejects.toThrow(AuthorizationError);
+    });
+
+    it('should return true when userId is the reply owner', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const isOwnReply = await replyRepository.verifyReplyOwner({
+        replyId: 'reply-123',
+        userId: 'user-123',
+      });
+
+      expect(isOwnReply).toEqual(true);
+    });
+  });
+
+  describe('softDeleteReply function', () => {
+    it('should throw NotFoundError when reply not found', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      await expect(replyRepository.softDeleteReply('reply-nonexistent'))
+        .rejects.toThrow(NotFoundError);
+    });
+
+    it('should soft-delete reply from database', async () => {
+      const fakeIdGenerator = () => '456';
+      const replyRepository = new ReplyRepositoryPostgres(pool, fakeIdGenerator);
+
+      const result = await replyRepository.softDeleteReply('reply-123');
+
+      expect(result).toStrictEqual({ isDeleted: true });
     });
   });
 });

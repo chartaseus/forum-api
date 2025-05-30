@@ -153,16 +153,16 @@ describe('/threads endpoint', () => {
 
       expect(response.statusCode).toEqual(200);
       expect(responseJson.status).toEqual('success');
-      expect(responseJson.data.thread).toMatchObject({
+      expect(responseJson.data.thread).toEqual({
         id: threadId,
         title: 'test',
         body: 'test helper',
+        date: expect.any(String),
         username: 'threadstesthelper',
+        comments: expect.any(Array),
       });
-      expect(responseJson.data.thread.date).toBeDefined();
-      expect(comments).toBeDefined();
       comments.forEach((comment) => {
-        expect(comment.replies).toBeDefined();
+        expect(comment.replies).toEqual(expect.any(Array));
       });
     });
 
@@ -194,8 +194,20 @@ describe('/threads endpoint', () => {
       expect(comments).toHaveLength(2);
 
       const [comment1, comment2] = comments;
-      expect(comment1.id).toEqual('comment-first');
-      expect(comment2.id).toEqual('comment-second');
+      expect(comment1).toEqual({
+        id: firstCommentId,
+        content: 'comment test helper',
+        username: 'threadstesthelper',
+        date: expect.any(String),
+        replies: expect.any(Array),
+      });
+      expect(comment2).toEqual({
+        id: secondCommentId,
+        content: 'comment test helper',
+        username: 'threadstesthelper',
+        date: expect.any(String),
+        replies: expect.any(Array),
+      });
     });
 
     it('should return deleted comment content as "**komentar telah dihapus**"', async () => {
@@ -226,10 +238,25 @@ describe('/threads endpoint', () => {
       expect(comment2.replies).toHaveLength(1);
 
       const [reply1, reply2] = comment1.replies;
-      expect(reply1.id).toEqual(firstReplyId);
-      expect(reply2.id).toEqual(secondReplyId);
+      expect(reply1).toEqual({
+        id: firstReplyId,
+        content: 'reply test helper',
+        username: 'dicoding',
+        date: expect.any(String),
+      });
+      expect(reply2).toEqual({
+        id: secondReplyId,
+        content: 'reply test helper',
+        username: 'dicoding',
+        date: expect.any(String),
+      });
 
-      expect(comment2.replies[0].id).toEqual(thirdReplyId);
+      expect(comment2.replies[0]).toEqual({
+        id: thirdReplyId,
+        content: 'reply test helper',
+        username: 'dicoding',
+        date: expect.any(String),
+      });
     });
 
     it('should return deleted replies content as "**balasan telah dihapus**"', async () => {

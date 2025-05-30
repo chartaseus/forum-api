@@ -81,7 +81,10 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async softDeleteComment(id) {
     const query = {
-      text: 'UPDATE comments SET is_deleted = true WHERE id = $1 RETURNING is_deleted',
+      text: `UPDATE comments
+        SET is_deleted = true
+        WHERE id = $1
+        RETURNING is_deleted AS "isDeleted"`,
       values: [id],
     };
 

@@ -26,15 +26,17 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
   async checkThreadExistence(id) {
     const query = {
-      text: 'SELECT id FROM threads WHERE id = $1',
+      text: 'SELECT is_deleted AS "isDeleted" FROM threads WHERE id = $1',
       values: [id],
     };
 
-    const result = await this._pool.query(query);
+    const { rows, rowCount } = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!rowCount) {
       throw new NotFoundError('thread tidak ditemukan');
     }
+
+    return !rows[0].isDeleted;
   }
 
   async getThreadById(id) {

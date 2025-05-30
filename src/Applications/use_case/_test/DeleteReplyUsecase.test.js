@@ -91,7 +91,7 @@ describe('DeleteReplyUseCase', () => {
     mockThreadRepository.checkThreadExistence = jest.fn(() => Promise.resolve(true));
     mockCommentRepository.checkCommentExistence = jest.fn(() => Promise.resolve(false));
     mockReplyRepository.checkReplyExistence = jest.fn(() => Promise.resolve(true));
-    mockReplyRepository.verifyReplyOwner = jest.fn(() => Promise.resolve());
+    mockReplyRepository.verifyReplyOwner = jest.fn(() => Promise.resolve(true));
     mockReplyRepository.softDeleteReply = jest.fn(() => Promise.resolve({ isDeleted: true }));
 
     const deleteReplyUseCase = new DeleteReplyUseCase({

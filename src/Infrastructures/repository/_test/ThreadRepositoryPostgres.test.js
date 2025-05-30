@@ -67,14 +67,27 @@ describe('ThreadRepositoryPostgres', () => {
       await expect(threadRepositoryPostgres.checkThreadExistence(nonexistentThreadId))
         .rejects.toThrow(NotFoundError);
     });
-    it('should not throw error when thread exists', async () => {
-      await ThreadsTableTestHelper.addThread({ userId: 'user-123' });
+
+    it('should return true when thread exists', async () => {
+      await ThreadsTableTestHelper.addThread({});
 
       const fakeIdGenerator = () => '123';
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
 
-      await expect(threadRepositoryPostgres.checkThreadExistence('thread-123'))
-        .resolves.not.toThrow();
+      const threadExists = await threadRepositoryPostgres.checkThreadExistence('thread-123');
+
+      expect(threadExists).toEqual(true);
+    });
+
+    it('should return false when thread status is deleted', async () => {
+      await ThreadsTableTestHelper.addDeletedThread({ id: 'thread-todelete' });
+
+      const fakeIdGenerator = () => '123';
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, fakeIdGenerator);
+
+      const threadExists = await threadRepositoryPostgres.checkThreadExistence('thread-todelete');
+
+      expect(threadExists).toEqual(false);
     });
   });
 
@@ -99,10 +112,11 @@ describe('ThreadRepositoryPostgres', () => {
       const thread = await threadRepositoryPostgres.getThreadById(threadId);
 
       expect(thread).toBeInstanceOf(ThreadDetail);
-      expect(thread).toMatchObject({
+      expect(thread).toEqual({
         id: threadId,
         title: 'test',
         body: 'test helper',
+        date: expect.any(String),
         username: 'dicoding',
       });
     });

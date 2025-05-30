@@ -167,9 +167,20 @@ describe('CommentRepositoryPostgres', () => {
         expect(comment).toBeInstanceOf(CommentDetail);
       });
 
-      // comment sorting
-      expect(comments[0].id).toEqual(firstCommentId);
-      expect(comments[1].id).toEqual(secondCommentId);
+      // comment properties & sorting
+      const [comment1, comment2] = comments;
+      expect(comment1).toEqual({
+        id: firstCommentId,
+        username: 'dicoding',
+        date: expect.any(String),
+        content: 'comment test helper',
+      });
+      expect(comment2).toEqual({
+        id: secondCommentId,
+        username: 'dicoding',
+        date: expect.any(String),
+        content: 'comment test helper',
+      });
     });
   });
 
@@ -188,7 +199,7 @@ describe('CommentRepositoryPostgres', () => {
 
       const result = await commentRepository.softDeleteComment('comment-123');
 
-      expect(result).toStrictEqual({ is_deleted: true });
+      expect(result).toStrictEqual({ isDeleted: true });
     });
   });
 });

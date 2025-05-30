@@ -105,9 +105,22 @@ describe('ReplyRepositoryPostgres', () => {
         expect(reply).toBeInstanceOf(ReplyDetail);
       });
 
-      // reply sorting
-      expect(replies[0].id).toEqual(firstReplyId);
-      expect(replies[1].id).toEqual(secondReplyId);
+      // reply properties & sorting
+      const [reply1, reply2] = replies;
+      expect(reply1).toEqual({
+        id: firstReplyId,
+        username: 'dicoding',
+        date: expect.any(String),
+        commentId: commentId,
+        content: 'reply test helper',
+      });
+      expect(reply2).toEqual({
+        id: secondReplyId,
+        username: 'dicoding',
+        date: expect.any(String),
+        commentId: commentId,
+        content: 'reply test helper',
+      });
     });
   });
 

@@ -16,6 +16,21 @@ const ThreadsTableTestHelper = {
     await pool.query(query);
   },
 
+  async addDeletedThread({
+    id = 'thread-deleted',
+    title = 'test',
+    body = 'test helper',
+    userId = 'user-123',
+    isDeleted = true,
+  }) {
+    const query = {
+      text: 'INSERT INTO threads (id, title, body, owner, is_deleted) VALUES($1, $2, $3, $4, $5)',
+      values: [id, title, body, userId, isDeleted],
+    };
+
+    await pool.query(query);
+  },
+
   async findThreadById(id) {
     const query = {
       text: 'SELECT * FROM threads WHERE id = $1',

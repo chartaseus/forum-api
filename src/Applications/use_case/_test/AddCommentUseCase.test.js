@@ -21,7 +21,7 @@ describe('AddCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     mockCommentRepository.addComment = jest.fn(() => Promise.resolve(mockPostedComment));
-    mockThreadRepository.checkThreadExistence = jest.fn(() => Promise.resolve());
+    mockThreadRepository.checkThreadExistence = jest.fn(() => Promise.resolve(true));
 
     const addCommentUseCase = new AddCommentUseCase({
       commentRepository: mockCommentRepository,

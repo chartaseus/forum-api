@@ -1,3 +1,4 @@
+const CommentLikesTableTestHelper = require('../../../../tests/CommentLikesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -278,6 +279,95 @@ describe('/threads/{threadId}/comments endpoint', () => {
       expect(response.statusCode).toEqual(400);
       expect(responseJson.status).toEqual('fail');
       expect(responseJson.message).toEqual('gagal menghapus komentar karena tipe data tidak sesuai');
+    });
+  });
+
+  describe('when PUT /comments/{commentId}/likes', () => {
+    const { id: commentId, threadId, userId } = preaddedComment;
+
+    it('should respond with 200 when liking valid comment', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        auth: {
+          strategy: 'forum_jwt',
+          credentials: { id: userId },
+        },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+
+    it('should respond with 200 when unliking valid comment', async () => {
+      await CommentLikesTableTestHelper.addLike({ commentId, userId });
+
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+        auth: {
+          strategy: 'forum_jwt',
+          credentials: { id: userId },
+        },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+
+    it('should respond with 401 when liking without authentication', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/${commentId}/likes`,
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(401);
+      expect(responseJson.message).toEqual('Missing authentication');
+    });
+
+    it('should respond with 404 when comment not found', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${threadId}/comments/comment-nonexistent/likes`,
+        auth: {
+          strategy: 'forum_jwt',
+          credentials: { id: userId },
+        },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('komentar tidak ditemukan');
+    });
+
+    it('should respond with 404 when thread not found', async () => {
+      const server = await createServer(container);
+
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/thread-nonexistent/comments/${commentId}/likes`,
+        auth: {
+          strategy: 'forum_jwt',
+          credentials: { id: userId },
+        },
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread tidak ditemukan');
     });
   });
 });

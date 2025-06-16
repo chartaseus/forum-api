@@ -1,3 +1,4 @@
+const CommentLikesTableTestHelper = require('../../../../tests/CommentLikesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -137,6 +138,10 @@ describe('CommentRepositoryPostgres', () => {
   });
 
   describe('getThreadComments function', () => {
+    afterEach(async () => {
+      await CommentLikesTableTestHelper.cleanTable();
+    });
+
     it('should return empty array if thread has no comments', async () => {
       const threadId = 'thread-gotnocommentsyet';
       await ThreadsTableTestHelper.addThread({ id: threadId });
@@ -156,6 +161,8 @@ describe('CommentRepositoryPostgres', () => {
       await ThreadsTableTestHelper.addThread({ id: threadId });
       await CommentsTableTestHelper.addComment({ threadId, id: firstCommentId });
       await CommentsTableTestHelper.addComment({ threadId, id: secondCommentId });
+      await CommentLikesTableTestHelper.addLike({ commentId: firstCommentId });
+      await CommentLikesTableTestHelper.addLike({ commentId: firstCommentId, userId: 'user-456' });
 
       const fakeIdGenerator = () => '456';
       const commentRepository = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -174,12 +181,14 @@ describe('CommentRepositoryPostgres', () => {
         username: 'dicoding',
         date: expect.any(String),
         content: 'comment test helper',
+        likeCount: 2,
       });
       expect(comment2).toEqual({
         id: secondCommentId,
         username: 'dicoding',
         date: expect.any(String),
         content: 'comment test helper',
+        likeCount: 0,
       });
     });
   });

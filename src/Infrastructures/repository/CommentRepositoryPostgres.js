@@ -66,10 +66,13 @@ class CommentRepositoryPostgres extends CommentRepository {
           comments.time::TEXT AS "date",
           comments.body AS "content",
           comments.is_deleted AS "isDeleted",
-          users.username
+          users.username,
+          COUNT(comment_likes.user_id)::INTEGER AS "likeCount"
         FROM comments
         INNER JOIN users ON comments.owner = users.id
+        LEFT JOIN comment_likes ON comment_likes.comment_id = comments.id
         WHERE comments.parent = $1
+        GROUP BY comments.id, users.username
         ORDER BY comments.time ASC`,
       values: [threadId],
     };

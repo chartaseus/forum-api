@@ -74,35 +74,54 @@ describe('ViewThreadUseCase', () => {
 
     const thread = await viewThreadUseCase.execute({ threadId });
 
+    expect(thread).toEqual({
+      id: 'thread-viewthreadtest',
+      title: 'judul thread',
+      body: 'isi thread',
+      date: '2025-05-26T06:33:54.598Z',
+      username: 'user1',
+      comments: [
+        {
+          id: 'comment-1',
+          content: 'isi komentar',
+          date: '2025-05-26T06:34:54.598Z',
+          username: 'user2',
+          likeCount: 2,
+          replies: [
+            {
+              id: 'reply-1-1',
+              content: 'isi balasan',
+              date: '2025-05-26T06:36:54.598Z',
+              username: 'user1',
+            },
+          ],
+        },
+        {
+          id: 'comment-2',
+          content: '**komentar telah dihapus**',
+          date: '2025-05-26T06:35:54.598Z',
+          username: 'user1',
+          likeCount: 1,
+          replies: [
+            {
+              id: 'reply-2-1',
+              content: 'isi balasan',
+              date: '2025-05-26T06:37:54.598Z',
+              username: 'user2',
+            },
+            {
+              id: 'reply-2-2',
+              content: 'isi balasan',
+              date: '2025-05-26T06:38:54.598Z',
+              username: 'user1',
+            },
+          ],
+        },
+      ],
+    });
     expect(mockThreadRepository.checkThreadExistence).toHaveBeenCalledWith(threadId);
     expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(threadId);
     expect(mockCommentRepository.getThreadComments).toHaveBeenCalledWith(threadId);
     expect(mockReplyRepository.getThreadReplies).toHaveBeenCalledWith(threadId);
-    expect(thread.id).toEqual(threadDetail.id);
-    expect(thread.title).toEqual(threadDetail.title);
-    expect(thread.body).toEqual(threadDetail.body);
-    expect(thread.date).toEqual(threadDetail.date);
-    expect(thread.username).toEqual(threadDetail.username);
-    expect(thread.comments).toStrictEqual([comment1, comment2]);
-    expect(thread.comments[0].replies).toEqual([{
-      id: 'reply-1-1',
-      content: 'isi balasan',
-      date: '2025-05-26T06:36:54.598Z',
-      username: 'user1',
-    }]);
-    expect(thread.comments[1].replies).toEqual([
-      {
-        id: 'reply-2-1',
-        content: 'isi balasan',
-        date: '2025-05-26T06:37:54.598Z',
-        username: 'user2',
-      },
-      {
-        id: 'reply-2-2',
-        content: 'isi balasan',
-        date: '2025-05-26T06:38:54.598Z',
-        username: 'user1',
-      },
-    ]);
   });
 });

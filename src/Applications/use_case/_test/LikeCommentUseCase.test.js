@@ -70,6 +70,7 @@ describe('LikeCommentUseCase', () => {
     mockCommentRepository.checkCommentExistence = jest.fn(() => Promise.resolve(true));
     mockCommentLikeRepository.checkUserLikeOnComment = jest.fn(() => Promise.resolve(false));
     mockCommentLikeRepository.addLike = jest.fn(() => Promise.resolve());
+    const deleteLikeSpy = jest.spyOn(mockCommentLikeRepository, 'deleteLike');
 
     const likeCommentUseCase = new LikeCommentUseCase({
       likeRepository: mockCommentLikeRepository,
@@ -91,6 +92,7 @@ describe('LikeCommentUseCase', () => {
       commentId: useCasePayload.commentId,
       userId: useCasePayload.userId,
     });
+    expect(deleteLikeSpy).toHaveBeenCalledTimes(0);
   });
 
   it('should orchestrate unlike comment action correctly', async () => {
@@ -108,6 +110,7 @@ describe('LikeCommentUseCase', () => {
     mockCommentRepository.checkCommentExistence = jest.fn(() => Promise.resolve(true));
     mockCommentLikeRepository.checkUserLikeOnComment = jest.fn(() => Promise.resolve(true));
     mockCommentLikeRepository.deleteLike = jest.fn(() => Promise.resolve());
+    const addLikeSpy = jest.spyOn(mockCommentLikeRepository, 'addLike');
 
     const likeCommentUseCase = new LikeCommentUseCase({
       likeRepository: mockCommentLikeRepository,
@@ -131,5 +134,6 @@ describe('LikeCommentUseCase', () => {
         commentId: useCasePayload.commentId,
         userId: useCasePayload.userId,
       });
+    expect(addLikeSpy).toHaveBeenCalledTimes(0);
   });
 });

@@ -22,6 +22,7 @@ describe('ViewThreadUseCase', () => {
       date: '2025-05-26T06:34:54.598Z',
       username: 'user2',
       isDeleted: false,
+      likeCount: 2,
     });
     const comment2 = new CommentDetail({
       id: 'comment-2',
@@ -29,6 +30,7 @@ describe('ViewThreadUseCase', () => {
       date: '2025-05-26T06:35:54.598Z',
       username: 'user1',
       isDeleted: true,
+      likeCount: 1,
     });
     const reply1 = new ReplyDetail({
       id: 'reply-1-1',

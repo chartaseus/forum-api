@@ -1,3 +1,4 @@
+const CommentLikesTableTestHelper = require('../../../../tests/CommentLikesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
@@ -130,12 +131,16 @@ describe('/threads endpoint', () => {
       await ThreadsTableTestHelper.addThread({ id: threadId, userId });
       await CommentsTableTestHelper.addComment({ id: firstCommentId, threadId, userId });
       await CommentsTableTestHelper.addComment({ id: secondCommentId, threadId, userId });
+      await CommentLikesTableTestHelper.addLike({ commentId: firstCommentId });
+      await CommentLikesTableTestHelper.addLike({ commentId: secondCommentId });
+      await CommentLikesTableTestHelper.addLike({ commentId: secondCommentId, userId });
       await RepliesTableTestHelper.addReply({ id: firstReplyId, commentId: firstCommentId });
       await RepliesTableTestHelper.addReply({ id: secondReplyId, commentId: firstCommentId });
       await RepliesTableTestHelper.addReply({ id: thirdReplyId, commentId: secondCommentId });
     });
 
     afterEach(async () => {
+      await CommentLikesTableTestHelper.cleanTable();
       await RepliesTableTestHelper.cleanTable();
       await CommentsTableTestHelper.cleanTable();
     });
@@ -200,6 +205,7 @@ describe('/threads endpoint', () => {
         username: 'threadstesthelper',
         date: expect.any(String),
         replies: expect.any(Array),
+        likeCount: 1,
       });
       expect(comment2).toEqual({
         id: secondCommentId,
@@ -207,6 +213,7 @@ describe('/threads endpoint', () => {
         username: 'threadstesthelper',
         date: expect.any(String),
         replies: expect.any(Array),
+        likeCount: 2,
       });
     });
 
